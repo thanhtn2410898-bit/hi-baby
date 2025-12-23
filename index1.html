@@ -1,0 +1,599 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2685.3">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+  </style>
+</head>
+<body>
+<p class="p1">&lt;!doctype html&gt;</p>
+<p class="p1">&lt;html lang="vi"&gt;</p>
+<p class="p1">&lt;head&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;meta charset="utf-8" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;meta name="viewport" content="width=device-width,initial-scale=1" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;title&gt;Yêu Em&lt;/title&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;style&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>html, body { margin:0; height:100%; background:#0b1022; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>#app { position:fixed; inset:0; overflow:hidden; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>canvas { display:block; width:100%; height:100%; }</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.panel {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>position:fixed; top:14px; left:14px; width: 360px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>background: rgba(10,12,25,0.55);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border: 1px solid rgba(255,255,255,0.10);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 14px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>padding: 12px 12px 10px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>color: rgba(255,255,255,0.92);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>backdrop-filter: blur(10px);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>z-index: 10;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.panel h2 { margin:6px 0 8px; font-size: 15px; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.hint { font-size: 12.5px; line-height: 1.5; color: rgba(255,255,255,0.75); }</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.row { display:flex; gap:10px; align-items:center; margin-top:10px; flex-wrap:wrap; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>button {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>background:#1f2a5a; color:#fff; border:1px solid rgba(255,255,255,0.15);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>padding:10px 12px; border-radius:10px; cursor:pointer;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12px; color: rgba(255,255,255,0.85); margin-top:10px; }</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>#photoOverlay {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>position:fixed;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>right: 18px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>top: 50%;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>transform: translateY(-50%);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>width: min(320px, 30vw);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>z-index: 12;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>opacity: 0;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>pointer-events: none;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>transition: opacity 220ms ease;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>#photoOverlay.on { opacity: 1; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.photoPanel {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>background: rgba(255,240,200,0.12);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border: 1px solid rgba(255,255,255,0.18);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 18px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>padding: 12px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>backdrop-filter: blur(10px);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>box-shadow: 0 0 40px rgba(255,240,200,0.12);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.photoStack { display:grid; gap:12px; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.photoStack img {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>width:100%;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>aspect-ratio: 4/3;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>object-fit: cover;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 14px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border: 1px solid rgba(255,255,255,0.18);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>box-shadow: 0 0 24px rgba(255,255,255,0.08);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>/* “Letter” modal */</p>
+<p class="p1"><span class="Apple-converted-space">    </span>#letterBackdrop{</p>
+<p class="p1"><span class="Apple-converted-space">      </span>position:fixed; inset:0; display:none; place-items:center;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>background: rgba(0,0,0,0.55);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>z-index: 20;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>padding: 18px;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>#letterBackdrop.on{ display:grid; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.letter {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>width: min(680px, 92vw);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 18px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>background: rgba(255,250,240,0.92);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>color:#1b1b1b;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>box-shadow: 0 18px 80px rgba(0,0,0,0.35);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border: 1px solid rgba(255,255,255,0.55);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>overflow:hidden;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.letterHeader{</p>
+<p class="p1"><span class="Apple-converted-space">      </span>padding: 14px 16px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>background: linear-gradient(90deg, rgba(255,230,190,0.85), rgba(255,245,225,0.85));</p>
+<p class="p1"><span class="Apple-converted-space">      </span>display:flex; align-items:center; justify-content:space-between;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>gap: 12px;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.letterHeader b{ font-size: 14px; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.letterBody{</p>
+<p class="p1"><span class="Apple-converted-space">      </span>padding: 16px 18px 18px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>line-height: 1.65;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-size: 14.5px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>white-space: pre-wrap;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.xbtn{</p>
+<p class="p1"><span class="Apple-converted-space">      </span>background: rgba(0,0,0,0.08);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border: 1px solid rgba(0,0,0,0.10);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>color:#111;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>padding: 8px 10px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 10px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>cursor:pointer;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/style&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;script type="importmap"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>{</p>
+<p class="p1"><span class="Apple-converted-space">      </span>"imports": {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>"three": "https://unpkg.com/three@0.160.0/build/three.module.js",</p>
+<p class="p1"><span class="Apple-converted-space">        </span>"three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/script&gt;</p>
+<p class="p1">&lt;/head&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;body&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;div id="app"&gt;&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;div class="panel"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;h2&gt;Yêu Em — Noel Cinematic&lt;/h2&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="hint"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>Điều khiển (không dùng camera):&lt;br/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>- &lt;b&gt;A&lt;/b&gt;: nhìn cây thông &amp;nbsp;&amp;nbsp; - &lt;b&gt;D&lt;/b&gt;: zoom cửa (thư)&lt;br/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>- &lt;b&gt;Space&lt;/b&gt;: “pulse” đèn + rung nhẹ&lt;br/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>- &lt;b&gt;P&lt;/b&gt;: hiện 3 ảnh trong 4 giây&lt;br/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>- &lt;b&gt;L&lt;/b&gt;: mở bức thư&lt;br/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>- &lt;b&gt;Esc&lt;/b&gt;: trở về góc nhìn gốc / đóng thư</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="row"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;button id="btnTree"&gt;Nhìn cây (A)&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;button id="btnDoor"&gt;Zoom cửa (D)&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;button id="btnPulse"&gt;Pulse (Space)&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;button id="btnPhotos"&gt;3 ảnh (P)&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;button id="btnLetter"&gt;Bức thư (L)&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="mono" id="stat"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;div id="photoOverlay"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="photoPanel"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="photoStack"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;img src="coay_1.jpg" alt="coay_1" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;img src="coay_2.jpg" alt="coay_2" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;img src="coay_3.jpg" alt="coay_3" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;div id="letterBackdrop" aria-hidden="true"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="letter" role="dialog" aria-modal="true"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="letterHeader"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;b&gt;Bức thư dành cho em&lt;/b&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;button class="xbtn" id="closeLetter"&gt;Đóng (Esc)&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="letterBody" id="letterText"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;script type="module"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>import * as THREE from "three";</p>
+<p class="p1"><span class="Apple-converted-space">    </span>import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";</p>
+<p class="p1"><span class="Apple-converted-space">    </span>import { RenderPass } from "three/addons/postprocessing/RenderPass.js";</p>
+<p class="p1"><span class="Apple-converted-space">    </span>import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>/* =========================</p>
+<p class="p1"><span class="Apple-converted-space">       </span>CONFIG / HELPERS</p>
+<p class="p1"><span class="Apple-converted-space">    </span>========================= */</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const clamp = (x,a,b)=&gt;Math.max(a, Math.min(b,x));</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>const statEl = document.getElementById("stat");</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const photoOverlay = document.getElementById("photoOverlay");</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>const letterBackdrop = document.getElementById("letterBackdrop");</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const letterText = document.getElementById("letterText");</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const closeLetter = document.getElementById("closeLetter");</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>const PHOTO_SHOW_MS = 4000;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>const LETTER =</p>
+<p class="p1">`Em à,</p>
+<p class="p2"><br></p>
+<p class="p1">Cảm ơn em vì đã đến trong cuộc đời anh — theo cách dịu dàng mà anh không ngờ nhất. Có những ngày anh mệt, có những lúc anh vụng về, nhưng chỉ cần nghĩ đến em, mọi thứ như chậm lại, ấm hơn, và đáng để cố gắng hơn.</p>
+<p class="p2"><br></p>
+<p class="p1">Anh không hứa sẽ luôn hoàn hảo. Nhưng anh hứa sẽ luôn chân thành. Anh sẽ lắng nghe em nhiều hơn, hiểu em nhiều hơn, và trân trọng em nhiều hơn mỗi ngày. Anh không muốn em phải buồn hay phiền lòng vì những điều thuộc về anh — nên nếu có lúc anh làm sai, anh sẽ nhận lỗi, sửa đổi, và chọn em một lần nữa.</p>
+<p class="p2"><br></p>
+<p class="p1">Nếu một ngày em thấy thế giới ngoài kia quá ồn ào, hãy về đây — anh vẫn ở đây, giữ một góc bình yên cho em. Và dù mai này có thế nào, anh vẫn mong chúng ta sẽ có cơ hội nắm tay nhau đi qua những điều đẹp nhất.</p>
+<p class="p2"><br></p>
+<p class="p1">Yêu em.`;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>letterText.textContent = LETTER;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function openLetter(){</p>
+<p class="p1"><span class="Apple-converted-space">      </span>letterBackdrop.classList.add("on");</p>
+<p class="p1"><span class="Apple-converted-space">      </span>letterBackdrop.setAttribute("aria-hidden", "false");</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>function hideLetter(){</p>
+<p class="p1"><span class="Apple-converted-space">      </span>letterBackdrop.classList.remove("on");</p>
+<p class="p1"><span class="Apple-converted-space">      </span>letterBackdrop.setAttribute("aria-hidden", "true");</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>closeLetter.addEventListener("click", hideLetter);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>letterBackdrop.addEventListener("click", (e)=&gt;{</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if(e.target === letterBackdrop) hideLetter();</p>
+<p class="p1"><span class="Apple-converted-space">    </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>/* =========================</p>
+<p class="p1"><span class="Apple-converted-space">       </span>THREE.JS SCENE</p>
+<p class="p1"><span class="Apple-converted-space">    </span>========================= */</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const app = document.getElementById("app");</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });</p>
+<p class="p1"><span class="Apple-converted-space">    </span>renderer.setPixelRatio(Math.min(devicePixelRatio, 2));</p>
+<p class="p1"><span class="Apple-converted-space">    </span>renderer.setSize(window.innerWidth, window.innerHeight);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>renderer.setClearColor(0x0b1022, 1);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>app.appendChild(renderer.domElement);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>const scene = new THREE.Scene();</p>
+<p class="p1"><span class="Apple-converted-space">    </span>scene.fog = new THREE.Fog(0x0b1022, 8, 32);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>const camera = new THREE.PerspectiveCamera(55, window.innerWidth/window.innerHeight, 0.1, 200);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>camera.position.set(0, 3.6, 12);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>camera.lookAt(0, 2.0, 0);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>const composer = new EffectComposer(renderer);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>composer.addPass(new RenderPass(scene, camera));</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const bloom = new UnrealBloomPass(</p>
+<p class="p1"><span class="Apple-converted-space">      </span>new THREE.Vector2(window.innerWidth, window.innerHeight),</p>
+<p class="p1"><span class="Apple-converted-space">      </span>0.9,</p>
+<p class="p1"><span class="Apple-converted-space">      </span>0.35,</p>
+<p class="p1"><span class="Apple-converted-space">      </span>0.25</p>
+<p class="p1"><span class="Apple-converted-space">    </span>);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>composer.addPass(bloom);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>// Lights</p>
+<p class="p1"><span class="Apple-converted-space">    </span>scene.add(new THREE.AmbientLight(0xffffff, 0.25));</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const moonLight = new THREE.DirectionalLight(0xbfd8ff, 0.55);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>moonLight.position.set(-6, 10, 6);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>scene.add(moonLight);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>// Ground</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const ground = new THREE.Mesh(</p>
+<p class="p1"><span class="Apple-converted-space">      </span>new THREE.PlaneGeometry(70, 50),</p>
+<p class="p1"><span class="Apple-converted-space">      </span>new THREE.MeshStandardMaterial({ color: 0xdee2ea, roughness: 0.9, metalness: 0.0 })</p>
+<p class="p1"><span class="Apple-converted-space">    </span>);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>ground.rotation.x = -Math.PI/2;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>scene.add(ground);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>// House</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const house = new THREE.Group(); scene.add(house);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>const base = new THREE.Mesh(</p>
+<p class="p1"><span class="Apple-converted-space">      </span>new THREE.BoxGeometry(6, 4.2, 5),</p>
+<p class="p1"><span class="Apple-converted-space">      </span>new THREE.MeshStandardMaterial({ color: 0x78462e, roughness: 0.95 })</p>
+<p class="p1"><span class="Apple-converted-space">    </span>);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>base.position.set(0, 2.1, 0);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>house.add(base);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>const roof = new THREE.Mesh(</p>
+<p class="p1"><span class="Apple-converted-space">      </span>new THREE.ConeGeometry(4.8, 2.2, 4),</p>
+<p class="p1"><span class="Apple-converted-space">      </span>new THREE.MeshStandardMaterial({ color: 0x5b2a22, roughness: 0.95 })</p>
+<p class="p1"><span class="Apple-converted-space">    </span>);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>roof.position.set(0, 5.1, 0);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>roof.rotation.y = Math.PI/4;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>house.add(roof);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>const chimney = new THREE.Mesh(</p>
+<p class="p1"><span class="Apple-converted-space">      </span>new THREE.BoxGeometry(1.1, 2.8, 1.1),</p>
+<p class="p1"><span class="Apple-converted-space">      </span>new THREE.MeshStandardMaterial({ color: 0x3d1c18, roughness: 0.95 })</p>
+<p class="p1"><span class="Apple-converted-space">    </span>);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>chimney.position.set(2.1, 6.0, -0.8);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>house.add(chimney);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>const doorAnchor = new THREE.Object3D();</p>
+<p class="p1"><span class="Apple-converted-space">    </span>doorAnchor.position.set(0, 1.6, 2.45);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>house.add(doorAnchor);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>// Tree</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const tree = new THREE.Group();</p>
+<p class="p1"><span class="Apple-converted-space">    </span>tree.position.set(-6, 0, 2);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>scene.add(tree);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>const trunk = new THREE.Mesh(</p>
+<p class="p1"><span class="Apple-converted-space">      </span>new THREE.CylinderGeometry(0.25, 0.3, 1.2, 12),</p>
+<p class="p1"><span class="Apple-converted-space">      </span>new THREE.MeshStandardMaterial({ color: 0x5a3c23, roughness: 0.95 })</p>
+<p class="p1"><span class="Apple-converted-space">    </span>);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>trunk.position.set(0, 0.6, 0);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>tree.add(trunk);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>const foliage = new THREE.Mesh(</p>
+<p class="p1"><span class="Apple-converted-space">      </span>new THREE.ConeGeometry(1.9, 3.8, 20),</p>
+<p class="p1"><span class="Apple-converted-space">      </span>new THREE.MeshStandardMaterial({ color: 0x2a8b4a, roughness: 0.95 })</p>
+<p class="p1"><span class="Apple-converted-space">    </span>);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>foliage.position.set(0, 2.8, 0);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>tree.add(foliage);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>const treeAnchor = new THREE.Object3D();</p>
+<p class="p1"><span class="Apple-converted-space">    </span>treeAnchor.position.set(-6, 2.2, 2);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>scene.add(treeAnchor);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>// Roof bulbs</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const bulbs = new THREE.Group(); house.add(bulbs);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const bulbGeo = new THREE.SphereGeometry(0.08, 12, 12);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const bulbMats = Array.from({length: 14}, (_,i)=&gt; new THREE.MeshStandardMaterial({</p>
+<p class="p1"><span class="Apple-converted-space">      </span>color: 0xffffff,</p>
+<p class="p1"><span class="Apple-converted-space">      </span>emissive: new THREE.Color().setHSL((i*0.11)%1, 0.8, 0.55),</p>
+<p class="p1"><span class="Apple-converted-space">      </span>emissiveIntensity: 1.4,</p>
+<p class="p1"><span class="Apple-converted-space">      </span>roughness: 0.3,</p>
+<p class="p1"><span class="Apple-converted-space">      </span>metalness: 0.0</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}));</p>
+<p class="p1"><span class="Apple-converted-space">    </span>for(let i=0;i&lt;14;i++){</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const b = new THREE.Mesh(bulbGeo, bulbMats[i]);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const x = -2.6 + i*0.4;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const y = 4.35 + Math.sin(i*0.45)*0.08;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const z = 2.4 - Math.abs(Math.sin(i*0.25))*0.55;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>b.position.set(x, y, z);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>bulbs.add(b);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>// Smoke</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const smokeGroup = new THREE.Group(); scene.add(smokeGroup);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>function spawnSmoke(){</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const sprMat = new THREE.SpriteMaterial({ color: 0xe6e9ef, transparent:true, opacity:0.18 });</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const s = new THREE.Sprite(sprMat);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>s.position.copy(chimney.getWorldPosition(new THREE.Vector3())).add(new THREE.Vector3(</p>
+<p class="p1"><span class="Apple-converted-space">        </span>(Math.random()*2-1)*0.08, 0.4, (Math.random()*2-1)*0.08</p>
+<p class="p1"><span class="Apple-converted-space">      </span>));</p>
+<p class="p1"><span class="Apple-converted-space">      </span>s.scale.setScalar(0.6 + Math.random()*0.25);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>s.userData = { vx:(Math.random()*2-1)*0.14, vy:0.55 + Math.random()*0.25, vz:(Math.random()*2-1)*0.14, life:1.8 + Math.random()*0.7, t:0 };</p>
+<p class="p1"><span class="Apple-converted-space">      </span>smokeGroup.add(s);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>// Snow</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const snowCount = 1800;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const snowGeo = new THREE.BufferGeometry();</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const snowPos = new Float32Array(snowCount * 3);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const snowVel = new Float32Array(snowCount * 3);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>for(let i=0;i&lt;snowCount;i++){</p>
+<p class="p1"><span class="Apple-converted-space">      </span>snowPos[i*3+0] = (Math.random()*2-1)*22;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>snowPos[i*3+1] = Math.random()*14 + 1;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>snowPos[i*3+2] = (Math.random()*2-1)*18;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>snowVel[i*3+0] = (Math.random()*2-1)*0.10;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>snowVel[i*3+1] = -(0.8 + Math.random()*1.8);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>snowVel[i*3+2] = (Math.random()*2-1)*0.10;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>snowGeo.setAttribute("position", new THREE.BufferAttribute(snowPos, 3));</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const snow = new THREE.Points(</p>
+<p class="p1"><span class="Apple-converted-space">      </span>snowGeo,</p>
+<p class="p1"><span class="Apple-converted-space">      </span>new THREE.PointsMaterial({ color: 0xfafaff, size: 0.03, transparent:true, opacity:0.9 })</p>
+<p class="p1"><span class="Apple-converted-space">    </span>);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>scene.add(snow);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>// Guide orb</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const orb = new THREE.Mesh(</p>
+<p class="p1"><span class="Apple-converted-space">      </span>new THREE.SphereGeometry(0.22, 32, 32),</p>
+<p class="p1"><span class="Apple-converted-space">      </span>new THREE.MeshStandardMaterial({ color:0xffffff, emissive:0xffe5b8, emissiveIntensity:2.8, roughness:0.2 })</p>
+<p class="p1"><span class="Apple-converted-space">    </span>);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>orb.position.set(3.0, 4.8, 3.0);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>scene.add(orb);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>// Trail</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const trailMax = 55;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const trailPts = [];</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const trailGeo = new THREE.BufferGeometry();</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const trailPos = new Float32Array(trailMax * 3);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>trailGeo.setAttribute("position", new THREE.BufferAttribute(trailPos, 3));</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const trail = new THREE.Line(</p>
+<p class="p1"><span class="Apple-converted-space">      </span>trailGeo,</p>
+<p class="p1"><span class="Apple-converted-space">      </span>new THREE.LineBasicMaterial({ color: 0xffe5b8, transparent:true, opacity:0.35 })</p>
+<p class="p1"><span class="Apple-converted-space">    </span>);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>scene.add(trail);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function pushTrail(v){</p>
+<p class="p1"><span class="Apple-converted-space">      </span>trailPts.push(v.clone());</p>
+<p class="p1"><span class="Apple-converted-space">      </span>while(trailPts.length &gt; trailMax) trailPts.shift();</p>
+<p class="p1"><span class="Apple-converted-space">      </span>for(let i=0;i&lt;trailMax;i++){</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const p = trailPts[Math.max(0, trailPts.length-trailMax+i)] || trailPts[0] || v;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>trailPos[i*3+0] = p.x;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>trailPos[i*3+1] = p.y;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>trailPos[i*3+2] = p.z;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>trailGeo.attributes.position.needsUpdate = true;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>// Camera targets</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const camBasePos = new THREE.Vector3(0, 3.6, 12);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const camBaseLook = new THREE.Vector3(0, 2.2, 0);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function getDoorCam(){</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const p = doorAnchor.getWorldPosition(new THREE.Vector3());</p>
+<p class="p1"><span class="Apple-converted-space">      </span>return {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>camP: p.clone().add(new THREE.Vector3(0, 1.4, 2.6)),</p>
+<p class="p1"><span class="Apple-converted-space">        </span>look: p.clone().add(new THREE.Vector3(0, 0.4, 0))</p>
+<p class="p1"><span class="Apple-converted-space">      </span>};</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>function getTreeCam(){</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const p = treeAnchor.getWorldPosition(new THREE.Vector3());</p>
+<p class="p1"><span class="Apple-converted-space">      </span>return {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>camP: p.clone().add(new THREE.Vector3(0.5, 1.6, 4.3)),</p>
+<p class="p1"><span class="Apple-converted-space">        </span>look: p.clone().add(new THREE.Vector3(0, 0.4, 0))</p>
+<p class="p1"><span class="Apple-converted-space">      </span>};</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>// State</p>
+<p class="p1"><span class="Apple-converted-space">    </span>let cameraMode = "BASE"; // BASE | DOOR | TREE</p>
+<p class="p1"><span class="Apple-converted-space">    </span>let cameraModeUntil = 0;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>let lightsBoostUntil = 0;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>let shakeUntil = 0;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>let orbPulseUntil = 0;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>let photoShowUntil = 0;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function pulse(){</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const now = performance.now();</p>
+<p class="p1"><span class="Apple-converted-space">      </span>lightsBoostUntil = now + 1200;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>shakeUntil = now + 180;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>orbPulseUntil = now + 1200;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>function showPhotos(){</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const now = performance.now();</p>
+<p class="p1"><span class="Apple-converted-space">      </span>photoShowUntil = now + PHOTO_SHOW_MS;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>lightsBoostUntil = Math.max(lightsBoostUntil, now + 1500);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>shakeUntil = Math.max(shakeUntil, now + 220);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>orbPulseUntil = Math.max(orbPulseUntil, now + 1500);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>function setMode(mode){</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const now = performance.now();</p>
+<p class="p1"><span class="Apple-converted-space">      </span>cameraMode = mode;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>cameraModeUntil = now + 1200;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>function resetMode(){</p>
+<p class="p1"><span class="Apple-converted-space">      </span>cameraMode = "BASE";</p>
+<p class="p1"><span class="Apple-converted-space">      </span>cameraModeUntil = 0;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>// UI buttons</p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById("btnTree").addEventListener("click", ()=&gt;setMode("TREE"));</p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById("btnDoor").addEventListener("click", ()=&gt;setMode("DOOR"));</p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById("btnPulse").addEventListener("click", pulse);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById("btnPhotos").addEventListener("click", showPhotos);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById("btnLetter").addEventListener("click", openLetter);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>// Keyboard</p>
+<p class="p1"><span class="Apple-converted-space">    </span>window.addEventListener("keydown", (e)=&gt;{</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if(e.key === "a" || e.key === "A") setMode("TREE");</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if(e.key === "d" || e.key === "D") setMode("DOOR");</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if(e.code === "Space") { e.preventDefault(); pulse(); }</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if(e.key === "p" || e.key === "P") showPhotos();</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if(e.key === "l" || e.key === "L") openLetter();</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if(e.key === "Escape"){ hideLetter(); resetMode(); photoOverlay.classList.remove("on"); }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>/* =========================</p>
+<p class="p1"><span class="Apple-converted-space">       </span>LOOP</p>
+<p class="p1"><span class="Apple-converted-space">    </span>========================= */</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const clock = new THREE.Clock();</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function animate(){</p>
+<p class="p1"><span class="Apple-converted-space">      </span>requestAnimationFrame(animate);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const dt = clock.getDelta();</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const t = clock.getElapsedTime();</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const now = performance.now();</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>// Snow update</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const pos = snowGeo.attributes.position.array;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>for(let i=0;i&lt;snowCount;i++){</p>
+<p class="p1"><span class="Apple-converted-space">        </span>pos[i*3+0] += snowVel[i*3+0]*dt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>pos[i*3+1] += snowVel[i*3+1]*dt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>pos[i*3+2] += snowVel[i*3+2]*dt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if(pos[i*3+1] &lt; 0.2){</p>
+<p class="p1"><span class="Apple-converted-space">          </span>pos[i*3+0] = (Math.random()*2-1)*22;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>pos[i*3+1] = Math.random()*14 + 8;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>pos[i*3+2] = (Math.random()*2-1)*18;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>snowGeo.attributes.position.needsUpdate = true;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>// Smoke</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if(Math.random() &lt; 0.18) spawnSmoke();</p>
+<p class="p1"><span class="Apple-converted-space">      </span>for(let i=smokeGroup.children.length-1;i&gt;=0;i--){</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const s = smokeGroup.children[i];</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const u = s.userData;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>u.t += dt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>s.position.x += u.vx*dt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>s.position.y += u.vy*dt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>s.position.z += u.vz*dt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>s.scale.multiplyScalar(1 + 0.25*dt);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>s.material.opacity = 0.18 * (1 - (u.t/u.life));</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if(u.t &gt; u.life) smokeGroup.remove(s);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>// Lights twinkle + boost</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const boost = (now &lt; lightsBoostUntil) ? 1.9 : 1.0;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>bulbs.children.forEach((b, i)=&gt;{</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const mat = b.material;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const puls = 0.6 + 0.4*Math.sin(t*2.2 + i*0.7);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>mat.emissiveIntensity = (1.2 + 1.0*puls) * boost;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>// Photos overlay</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if(now &lt; photoShowUntil) photoOverlay.classList.add("on");</p>
+<p class="p1"><span class="Apple-converted-space">      </span>else photoOverlay.classList.remove("on");</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>// Cinematic auto drift (very subtle)</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if(now &gt; cameraModeUntil) cameraMode = "BASE";</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>// Orb target</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const orbTarget = new THREE.Vector3(3.0, 4.8, 3.0);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if(cameraMode === "DOOR"){</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const p = doorAnchor.getWorldPosition(new THREE.Vector3());</p>
+<p class="p1"><span class="Apple-converted-space">        </span>orbTarget.copy(p).add(new THREE.Vector3(1.4, 2.0, 1.2));</p>
+<p class="p1"><span class="Apple-converted-space">      </span>} else if(cameraMode === "TREE"){</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const p = treeAnchor.getWorldPosition(new THREE.Vector3());</p>
+<p class="p1"><span class="Apple-converted-space">        </span>orbTarget.copy(p).add(new THREE.Vector3(1.2, 1.8, 1.6));</p>
+<p class="p1"><span class="Apple-converted-space">      </span>} else if(now &lt; photoShowUntil){</p>
+<p class="p1"><span class="Apple-converted-space">        </span>orbTarget.set(5.5, 4.6, 5.0);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>orbTarget.set(3.0 + 0.35*Math.sin(t*1.2), 4.8 + 0.25*Math.sin(t*1.7), 3.0);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>orb.position.lerp(orbTarget, 1 - Math.pow(0.001, dt));</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>// Orb pulse</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if(now &lt; orbPulseUntil){</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const p = 0.6 + 0.4*Math.sin(t*12);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>orb.material.emissiveIntensity = 3.4 + 2.2*p;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>bloom.strength = 1.05;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>orb.material.emissiveIntensity = 2.8;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>bloom.strength = 0.9;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>pushTrail(orb.position);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>// Camera targets</p>
+<p class="p1"><span class="Apple-converted-space">      </span>let targetCamPos = camBasePos.clone();</p>
+<p class="p1"><span class="Apple-converted-space">      </span>let targetLook = camBaseLook.clone();</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>if(cameraMode === "DOOR"){</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const d = getDoorCam();</p>
+<p class="p1"><span class="Apple-converted-space">        </span>targetCamPos = d.camP;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>targetLook = d.look;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>} else if(cameraMode === "TREE"){</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const d = getTreeCam();</p>
+<p class="p1"><span class="Apple-converted-space">        </span>targetCamPos = d.camP;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>targetLook = d.look;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>// subtle cinematic breathing</p>
+<p class="p1"><span class="Apple-converted-space">        </span>targetCamPos = camBasePos.clone().add(new THREE.Vector3(</p>
+<p class="p1"><span class="Apple-converted-space">          </span>0.15*Math.sin(t*0.35),</p>
+<p class="p1"><span class="Apple-converted-space">          </span>0.08*Math.sin(t*0.45),</p>
+<p class="p1"><span class="Apple-converted-space">          </span>0.10*Math.sin(t*0.30)</p>
+<p class="p1"><span class="Apple-converted-space">        </span>));</p>
+<p class="p1"><span class="Apple-converted-space">        </span>targetLook = camBaseLook.clone().add(new THREE.Vector3(</p>
+<p class="p1"><span class="Apple-converted-space">          </span>0.10*Math.sin(t*0.25),</p>
+<p class="p1"><span class="Apple-converted-space">          </span>0.06*Math.sin(t*0.22),</p>
+<p class="p1"><span class="Apple-converted-space">          </span>0</p>
+<p class="p1"><span class="Apple-converted-space">        </span>));</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>camera.position.lerp(targetCamPos, 1 - Math.pow(0.002, dt));</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const lookNow = new THREE.Vector3();</p>
+<p class="p1"><span class="Apple-converted-space">      </span>camera.getWorldDirection(lookNow);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const currLook = camera.position.clone().add(lookNow);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const nextLook = currLook.lerp(targetLook, 1 - Math.pow(0.002, dt));</p>
+<p class="p1"><span class="Apple-converted-space">      </span>camera.lookAt(nextLook);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>// Shake</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if(now &lt; shakeUntil){</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const amp = 0.06;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>camera.position.x += (Math.random()*2-1)*amp;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>camera.position.y += (Math.random()*2-1)*amp;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>camera.position.z += (Math.random()*2-1)*amp;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>statEl.textContent = `CAM=${cameraMode}<span class="Apple-converted-space">  </span>PHOTOS=${(now&lt;photoShowUntil)?"ON":"OFF"}`;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>composer.render();</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>animate();</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>window.addEventListener("resize", ()=&gt;{</p>
+<p class="p1"><span class="Apple-converted-space">      </span>renderer.setSize(window.innerWidth, window.innerHeight);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>camera.aspect = window.innerWidth / window.innerHeight;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>camera.updateProjectionMatrix();</p>
+<p class="p1"><span class="Apple-converted-space">      </span>composer.setSize(window.innerWidth, window.innerHeight);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>bloom.setSize(window.innerWidth, window.innerHeight);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>});</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/script&gt;</p>
+<p class="p1">&lt;/body&gt;</p>
+<p class="p1">&lt;/html&gt;</p>
+</body>
+</html>
